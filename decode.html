@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Decode</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+</head>
+<body style="background:#111;color:#0f0;font-family:monospace;padding:40px;font-size:18px;">
+<pre id="result"></pre>
+<script>
+const key = "lbl716619528688!";
+const params = new URLSearchParams(window.location.search);
+const input = params.get("");
+if (input) {
+    try {
+        const decrypted = CryptoJS.AES.decrypt(input, key).toString(CryptoJS.enc.Utf8);
+        document.getElementById("result").textContent = decrypted || "解密失败";
+    } catch(e) {
+        document.getElementById("result").textContent = "解密失败: " + e.message;
+    }
+} else {
+    document.getElementById("result").textContent = "用法: /decode?=要解密的内容";
+}
+</script>
+</body>
+</html>
