@@ -107,13 +107,14 @@
         @keyframes titleFlow { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
 
 
-        .post-card { animation: fadeInUp 0.5s ease forwards; opacity: 0; }
-        .post-card:nth-child(1) { animation-delay: 0.1s; }
-        .post-card:nth-child(2) { animation-delay: 0.2s; }
-        .post-card:nth-child(3) { animation-delay: 0.3s; }
-        .post-card:nth-child(4) { animation-delay: 0.4s; }
-        .post-card:nth-child(5) { animation-delay: 0.5s; }
-        .post-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .post-card { animation: cardReveal var(--md-duration-medium) var(--md-ease-decelerate) both; }
+        .post-card:nth-child(1) { animation-delay: 50ms; }
+        .post-card:nth-child(2) { animation-delay: 100ms; }
+        .post-card:nth-child(3) { animation-delay: 150ms; }
+        .post-card:nth-child(4) { animation-delay: 200ms; }
+        .post-card:nth-child(5) { animation-delay: 250ms; }
+        .post-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.12); }
+        .post-card:active { transform: translateY(0) scale(0.99); }
     </style>
 <script src="protect.js"></script></head>
 <body class="page-transition">
