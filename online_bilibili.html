@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>B站热门视频 - ぼりんの网站</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="animations.css">
     <style>
         :root {
             --bg-primary: #fff5f0;
@@ -102,19 +101,9 @@
         .refresh-btn:hover { background: var(--accent-hover); transform: translateY(-2px); }
         @media (max-width: 768px) { .title { font-size: 1.8rem; } .sidebar { width: 280px; left: -280px; } .videos-container { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); } .page-title { font-size: 2rem; } }
         @media (max-width: 480px) { header { padding: 15px 20px; } .title { font-size: 1.5rem; } .menu-btn { font-size: 1.5rem; } .sidebar { width: 100%; left: -100%; } .videos-container { grid-template-columns: 1fr; } .page-title { font-size: 1.8rem; } .video-cover { height: 150px; } .video-play-btn { width: 50px; height: 50px; } }
-
-        .video-card { animation: cardEnter 0.5s ease forwards; opacity: 0; }
-        .video-card:nth-child(1) { animation-delay: 0.1s; }
-        .video-card:nth-child(2) { animation-delay: 0.2s; }
-        .video-card:nth-child(3) { animation-delay: 0.3s; }
-        .video-card:nth-child(4) { animation-delay: 0.4s; }
-        .video-card:nth-child(5) { animation-delay: 0.5s; }
-        .video-card:nth-child(6) { animation-delay: 0.6s; }
-        .video-card:nth-child(n+7) { animation-delay: 0.7s; }
-        .video-card:hover { animation: pulseGlow 1s ease; }
     </style>
 <script src="protect.js"></script></head>
-<body class="page-transition">
+<body>
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <h2 class="sidebar-title">ぼりんの菜单</h2>
@@ -130,10 +119,8 @@
     </div>
     <div class="overlay" id="overlay"></div>
     <div class="notification" id="notification"><i class="fas fa-info-circle"></i><span id="notification-text">正在打开B站APP...</span></div>
-    <header>
-        <button class="menu-btn" id="menuToggle"><i class="fas fa-bars"></i></button>
         <h1 class="title">B站热门视频</h1>
-        <button class="menu-btn" id="themeToggle" onclick="toggleTheme()"><i class="fas fa-sun"></i></button>
+        
     </header>
     <main>
         <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> 返回首页</a>

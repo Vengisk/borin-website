@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ぼりんの网站</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="animations.css">
     <style>
         :root {
             --bg-primary: #fff5f0; --bg-secondary: #ffffff; --bg-card: rgba(255, 255, 255, 0.85); --text-primary: #3d2c29; --text-secondary: #8b7068; --accent: #fb7299; --border: rgba(251, 114, 153, 0.15); --shadow: rgba(251, 114, 153, 0.08); --gradient-1: #fff0eb; --gradient-2: #ffe4dc; --gradient-3: #ffd6cc; --gradient-4: #ffeee8; --header-bg: rgba(255, 255, 255, 0.92); --sidebar-bg: rgba(255, 248, 245, 0.97); --footer-bg: rgba(255, 248, 245, 0.92); --time-bg: rgba(255, 230, 220, 0.7);
@@ -59,7 +60,7 @@
     </style>
     <script src="protect.js"></script>
 </head>
-<body>
+<body class="page-transition">
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <h2 class="sidebar-title">ぼりんの菜单</h2>
@@ -82,25 +83,25 @@
     </header>
     
     <main>
-        <h2 class="welcome-text">欢迎来到ぼりんの网站！</h2>
-        <p class="sub-text">ぼりん•ボリンの勾石网站</p>
+        <h2 class="welcome-text animate-fadeInUp">欢迎来到ぼりんの网站！</h2>
+        <p class="sub-text animate-fadeInUp delay-100">ぼりん•ボリンの勾石网站</p>
         <div class="info-container">
-            <div class="info-card card-bilibili" onclick="location.href='bilibili.html'">
+            <div class="info-card card-bilibili animate-fadeInUp delay-100 hover-lift ripple-effect" onclick="location.href='bilibili.html'">
                 <i class="fab fa-bilibili"></i>
                 <h3>B站热门视频</h3>
                 <p>查看B站热门视频排行</p>
             </div>
-            <div class="info-card card-post" onclick="location.href='post.html'">
+            <div class="info-card card-post animate-fadeInUp delay-200 hover-lift ripple-effect" onclick="location.href='post.html'">
                 <i class="fas fa-newspaper"></i>
                 <h3>帖子动态</h3>
                 <p>浏览和发布帖子</p>
             </div>
-            <div class="info-card card-settings" onclick="location.href='settings.html'">
+            <div class="info-card card-settings animate-fadeInUp delay-300 hover-lift ripple-effect" onclick="location.href='settings.html'">
                 <i class="fas fa-cog"></i>
                 <h3>设置</h3>
                 <p>自定义网站主题和偏好</p>
             </div>
-            <div class="info-card card-about" onclick="location.href='about.html'">
+            <div class="info-card card-about animate-fadeInUp delay-400 hover-lift ripple-effect" onclick="location.href='about.html'">
                 <i class="fas fa-info-circle"></i>
                 <h3>关于我们</h3>
                 <p>了解更多关于这个网站</p>

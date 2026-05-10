@@ -25,6 +25,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>帖子详情 - ぼりんの网站</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../animations.css">
     <script src="../protect.js"></script>
     <style>
         :root { --bg-card: rgba(255, 255, 255, 0.85); --text-primary: #3d2c29; --text-secondary: #8b7068; --accent: #fb7299; --border: rgba(251, 114, 153, 0.15); --shadow: rgba(251, 114, 153, 0.08); --gradient-1: #fff0eb; --gradient-2: #ffe4dc; --gradient-3: #ffd6cc; --gradient-4: #ffeee8; --header-bg: rgba(255, 255, 255, 0.92); --footer-bg: rgba(255, 248, 245, 0.92); --time-bg: rgba(255, 230, 220, 0.7); --input-bg: rgba(230, 230, 240, 0.6); }
@@ -77,7 +78,7 @@
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
     </style>
 </head>
-<body>
+<body class="page-transition">
     <header>
         <button class="menu-btn" onclick="location.href='../post.html'"><i class="fas fa-arrow-left"></i></button>
         <h1 class="title">帖子详情</h1>

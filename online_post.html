@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>帖子 - ぼりんの网站</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="animations.css">
     <style>
         :root {
             --bg-primary: #fff5f0;
@@ -106,17 +105,9 @@
         @media (max-width: 768px) { .page-title { font-size: 2rem; } .post-actions { display: flex; } }
         @keyframes titleFlow { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
 
-
-        .post-card { animation: fadeInUp 0.5s ease forwards; opacity: 0; }
-        .post-card:nth-child(1) { animation-delay: 0.1s; }
-        .post-card:nth-child(2) { animation-delay: 0.2s; }
-        .post-card:nth-child(3) { animation-delay: 0.3s; }
-        .post-card:nth-child(4) { animation-delay: 0.4s; }
-        .post-card:nth-child(5) { animation-delay: 0.5s; }
-        .post-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
     </style>
 <script src="protect.js"></script></head>
-<body class="page-transition">
+<body>
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <h2 class="sidebar-title">ぼりんの菜单</h2>
@@ -218,33 +209,18 @@
         function extractTags(t) { return (t.match(/#[\u4e00-\u9fa5a-zA-Z0-9_]+/g) || []).map(x => x.substring(1)); }
         async function sha256(m) { const b = new TextEncoder().encode(m), h = await crypto.subtle.digest('SHA-256', b); return Array.from(new Uint8Array(h)).map(x => x.toString(16).padStart(2,'0')).join(''); }
         
-        function getHeaders() {
-            const headers = { 'Content-Type': 'application/json' };
-            if (_c.k) headers['X-Master-Key'] = '$2a$10$' + _c.k;
-            return headers;
-        }
+        function getHeaders() { return { 'Content-Type': 'application/json', 'X-Master-Key': '$2a$10$' + _c.k }; }
         
         initTheme();
         
         // ===== 数据操作 =====
         async function loadPosts() {
             showLoading(true, '加载帖子...');
-            const localPosts = JSON.parse(localStorage.getItem('borin_posts') || '[]');
             try {
                 const res = await fetch(API_URL + '/latest', { headers: getHeaders() });
-                if (res.ok) {
-                    const d = await res.json();
-                    const remotePosts = d.record.posts || [];
-                    // 合并数据：以本地为准，远程数据补充缺失的
-                    const localIds = new Set(localPosts.map(p => p.id));
-                    const newFromRemote = remotePosts.filter(p => !localIds.has(p.id));
-                    posts = [...localPosts, ...newFromRemote];
-                    // 按ID排序
-                    posts.sort((a, b) => b.id - a.id);
-                } else { posts = localPosts; }
-            } catch(e) { posts = localPosts; }
-            // 确保数据同步到云端
-            if (posts.length > 0) savePosts();
+                if (res.ok) { const d = await res.json(); posts = d.record.posts || []; }
+                else { posts = JSON.parse(localStorage.getItem('borin_posts') || '[]'); }
+            } catch(e) { posts = JSON.parse(localStorage.getItem('borin_posts') || '[]'); }
             showLoading(false);
             renderTags();
             renderPosts();
