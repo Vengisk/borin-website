@@ -498,53 +498,53 @@
 <body class="page-transition">
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h2 class="sidebar-title">ぼりんの菜单</h2>
+            <h2 class="sidebar-title" data-i18n="sidebarTitle">ぼりんの菜单</h2>
             <button class="close-btn" id="closeSidebar"><i class="fas fa-times"></i></button>
         </div>
         <div class="sidebar-menu">
-            <div class="menu-item" onclick="navigateTo('bilibili.html')"><i class="fab fa-bilibili bilibili-icon"></i><span>B站热门视频</span></div>
-            <div class="menu-item" onclick="navigateTo('post.html')"><i class="fas fa-newspaper"></i><span>帖子动态</span></div>
-            <div class="menu-item" onclick="navigateTo('settings.html')"><i class="fas fa-cog"></i><span>设置</span></div>
-            <div class="menu-item" onclick="navigateTo('about.html')"><i class="fas fa-info-circle"></i><span>关于我们</span></div>
+            <div class="menu-item" onclick="navigateTo('bilibili.html')"><i class="fab fa-bilibili bilibili-icon"></i><span data-i18n="menuBilibili">B站热门视频</span></div>
+            <div class="menu-item" onclick="navigateTo('post.html')"><i class="fas fa-newspaper"></i><span data-i18n="menuPost">帖子动态</span></div>
+            <div class="menu-item" onclick="navigateTo('settings.html')"><i class="fas fa-cog"></i><span data-i18n="menuSettings">设置</span></div>
+            <div class="menu-item" onclick="navigateTo('about.html')"><i class="fas fa-info-circle"></i><span data-i18n="menuAbout">关于我们</span></div>
         </div>
-        <div class="sidebar-footer" style="margin-top: auto; padding: 18px 0; text-align: center; color: var(--text-secondary);"><p>更多功能开发中...</p></div>
+        <div class="sidebar-footer" style="margin-top: auto; padding: 18px 0; text-align: center; color: var(--text-secondary);"><p data-i18n="moreSoon">更多功能开发中...</p></div>
     </div>
     <div class="overlay" id="overlay"></div>
 
     <header>
         <button class="menu-btn" id="menuToggle"><i class="fas fa-bars"></i></button>
-        <h1 class="title">ぼりんの网站</h1>
+        <h1 class="title" data-i18n="siteTitle">ぼりんの网站</h1>
         <button class="search-btn" id="searchToggle"><i class="fas fa-search"></i></button>
     </header>
 
     <main>
-        <h2 class="welcome-text">欢迎来到ぼりんの网站！</h2>
-        <p class="sub-text">ぼりん•ボリンの勾石网站</p>
+        <h2 class="welcome-text" data-i18n="welcomeText">欢迎来到ぼりんの网站！</h2>
+        <p class="sub-text" data-i18n="subText">ぼりん•ボリンの勾石网站</p>
         <div class="info-container">
             <div class="info-card card-bilibili d1" onclick="location.href='bilibili.html'">
                 <i class="fab fa-bilibili"></i>
-                <h3>B站热门视频</h3>
-                <p>查看B站热门视频排行</p>
+                <h3 data-i18n="cardBilibiliTitle">B站热门视频</h3>
+                <p data-i18n="cardBilibiliDesc">查看B站热门视频排行</p>
             </div>
             <div class="info-card card-post d2" onclick="location.href='post.html'">
                 <i class="fas fa-newspaper"></i>
-                <h3>帖子动态</h3>
-                <p>浏览和发布帖子</p>
+                <h3 data-i18n="cardPostTitle">帖子动态</h3>
+                <p data-i18n="cardPostDesc">浏览和发布帖子</p>
             </div>
             <div class="info-card card-settings d3" onclick="location.href='settings.html'">
                 <i class="fas fa-cog"></i>
-                <h3>设置</h3>
-                <p>自定义网站主题和偏好</p>
+                <h3 data-i18n="cardSettingsTitle">设置</h3>
+                <p data-i18n="cardSettingsDesc">自定义网站主题和偏好</p>
             </div>
             <div class="info-card card-about d4" onclick="location.href='about.html'">
                 <i class="fas fa-info-circle"></i>
-                <h3>关于我们</h3>
-                <p>了解更多关于这个网站</p>
+                <h3 data-i18n="cardAboutTitle">关于我们</h3>
+                <p data-i18n="cardAboutDesc">了解更多关于这个网站</p>
             </div>
         </div>
 
         <!-- MD3 动态配色：从这些“壁纸种子色”取色并重绘界面 -->
-        <div class="accent-dock" id="accentDock" title="动态配色">
+        <div class="accent-dock" id="accentDock" data-i18n-title="accentColor" title="动态配色">
             <div class="accent-dot" style="background:#fb7299" data-seed="#fb7299"></div>
             <div class="accent-dot" style="background:#86a8e7" data-seed="#86a8e7"></div>
             <div class="accent-dot" style="background:#7bd88f" data-seed="#7bd88f"></div>
@@ -554,10 +554,11 @@
     </main>
 
     <footer>
-        <div class="time-display"><i class="fas fa-clock time-icon"></i><span class="time-label">北京时间：</span><span class="time-value" id="beijing-time">00:00:00</span></div>
-        <div class="copyright">© 2026 ぼりんの网站 | ぼりん所有权</div>
+        <div class="time-display"><i class="fas fa-clock time-icon"></i><span class="time-label" data-i18n="beijingTime">北京时间：</span><span class="time-value" id="beijing-time">00:00:00</span></div>
+        <div class="copyright" data-i18n="footerIndex">© 2026 ぼりんの网站 | ぼりん所有权</div>
     </footer>
 
+    <script src="i18n.js"></script>
     <script>
         // 地址栏规范化：根路径重定向到 index.html
         if (window.location.pathname === "/" || window.location.pathname === "") {
@@ -583,6 +584,7 @@
             else applyTheme(getBeijingHour() >= 6 && getBeijingHour() < 18 ? 'light' : 'dark');
         }
         initTheme();
+        initI18n();
 
         /* ============ MD3 动态配色：从种子色派生色调 ============ */
         function hexToHsl(hex) {

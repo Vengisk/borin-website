@@ -328,21 +328,21 @@
 <body class="page-transition">
     <header>
         <button class="menu-btn" onclick="location.href='../post.html'"><i class="fas fa-arrow-left"></i></button>
-        <h1 class="title">帖子详情</h1>
+        <h1 class="title" data-i18n="postDetail">帖子详情</h1>
         <button class="search-btn" onclick="location.href='../search.html'"><i class="fas fa-search"></i></button>
     </header>
 
     <main>
         <div class="container">
-            <a href="../post.html" class="back-btn"><i class="fas fa-arrow-left"></i> 返回帖子列表</a>
-            <div class="loading" id="loading"><i class="fas fa-spinner"></i><p>加载中...</p></div>
+            <a href="../post.html" class="back-btn"><i class="fas fa-arrow-left"></i> <span data-i18n="backToPosts">返回帖子列表</span></a>
+            <div class="loading" id="loading"><i class="fas fa-spinner"></i><p data-i18n="loading">加载中...</p></div>
             <div class="post-card" id="postCard" style="display:none"></div>
             <div class="comments-section" id="commentsSection" style="display:none">
-                <h3 class="comments-title"><i class="fas fa-comments"></i> 评论区</h3>
+                <h3 class="comments-title"><i class="fas fa-comments"></i> <span data-i18n="commentsSection">评论区</span></h3>
                 <div class="comment-form">
-                    <input type="text" class="form-input" id="commentAuthor" placeholder="你的昵称" maxlength="20">
-                    <textarea class="form-input form-textarea" id="commentContent" placeholder="写下你的评论..." maxlength="1000"></textarea>
-                    <button class="submit-btn" onclick="submitComment()"><i class="fas fa-paper-plane"></i> 发表评论</button>
+                    <input type="text" class="form-input" id="commentAuthor" data-i18n-placeholder="nicknamePlaceholder" placeholder="你的昵称" maxlength="20">
+                    <textarea class="form-input form-textarea" id="commentContent" data-i18n-placeholder="commentPlaceholder" placeholder="写下你的评论..." maxlength="1000"></textarea>
+                    <button class="submit-btn" onclick="submitComment()"><i class="fas fa-paper-plane"></i> <span data-i18n="submitComment">发表评论</span></button>
                 </div>
                 <div class="comments-list" id="commentsList"></div>
             </div>
@@ -352,9 +352,10 @@
     <div class="toast" id="toast"></div>
 
     <footer>
-        <div class="copyright">© 2026 ぼりんの网站 | 帖子详情</div>
+        <div class="copyright" data-i18n="footerPostDetail">© 2026 ぼりんの网站 | 帖子详情</div>
     </footer>
 
+    <script src="../i18n.js"></script>
     <script>
         const API_POSTS = '/api/posts';
 
@@ -375,7 +376,6 @@
         function initTheme() { applyTheme(getCookie('theme') || (getBeijingHour() >= 6 && getBeijingHour() < 18 ? 'light' : 'dark')); }
         function getCookie(n) { const c = document.cookie.split('; ').find(r => r.startsWith(n + '=')); return c ? decodeURIComponent(c.split('=')[1]) : null; }
         function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2000); }
-        function getTimeAgo(d) { const diff = Date.now() - new Date(d).getTime(), m = Math.floor(diff/60000), h = Math.floor(diff/3600000), dd = Math.floor(diff/86400000); if(dd>30) return Math.floor(dd/30)+'个月前'; if(dd>0) return dd+'天前'; if(h>0) return h+'小时前'; if(m>0) return m+'分钟前'; return '刚刚'; }
         function formatDate(d) { const n = new Date(d); return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0')+' '+String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0'); }
 
         // ===== MD3 动态配色（继承首页种子色） =====
@@ -414,6 +414,7 @@
         }
 
         initTheme();
+        initI18n();
         const savedSeed = getCookie('seed');
         if (savedSeed) applySeed(savedSeed);
 
@@ -438,7 +439,7 @@
             document.getElementById('loading').style.display = 'none';
 
             if (!currentPost) {
-                document.getElementById('postCard').innerHTML = '<div class="not-found"><i class="fas fa-exclamation-circle"></i><p>帖子不存在</p><a href="../post.html" class="back-btn" style="margin-top:20px"><i class="fas fa-arrow-left"></i> 返回</a></div>';
+                document.getElementById('postCard').innerHTML = '<div class="not-found"><i class="fas fa-exclamation-circle"></i><p>' + t('postNotFound') + '</p><a href="../post.html" class="back-btn" style="margin-top:20px"><i class="fas fa-arrow-left"></i> ' + t('back') + '</a></div>';
                 document.getElementById('postCard').style.display = 'block';
                 return;
             }
@@ -470,7 +471,7 @@
 
         function renderComments() {
             const list = document.getElementById('commentsList'), comments = currentPost.comments || [];
-            if (!comments.length) { list.innerHTML = '<div class="no-comments"><i class="fas fa-comment-slash"></i><p>暂无评论</p></div>'; return; }
+            if (!comments.length) { list.innerHTML = '<div class="no-comments"><i class="fas fa-comment-slash"></i><p>' + t('noComments') + '</p></div>'; return; }
             list.innerHTML = comments.map(c =>
                 '<div class="comment-item"><div class="comment-header"><span class="comment-author">' + esc(c.author) + '</span><span class="comment-date">' + esc(formatDate(c.date)) + '</span></div><div class="comment-content">' + esc(c.content) + '</div></div>'
             ).join('');
@@ -479,8 +480,8 @@
         async function submitComment() {
             const author = document.getElementById('commentAuthor').value.trim();
             const content = document.getElementById('commentContent').value.trim();
-            if (!author) return showToast('请输入昵称');
-            if (!content) return showToast('请输入评论内容');
+            if (!author) return showToast(t('enterNickname'));
+            if (!content) return showToast(t('enterComment'));
             if (!currentPost.comments) currentPost.comments = [];
             currentPost.comments.push({ author, content, date: new Date().toISOString() });
             const idx = allPosts.findIndex(p => p.id === postId);
@@ -492,7 +493,7 @@
             document.getElementById('commentAuthor').value = '';
             document.getElementById('commentContent').value = '';
             renderComments();
-            showToast('评论成功！');
+            showToast(t('commentSuccess'));
         }
 
         loadPost();

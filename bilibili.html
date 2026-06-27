@@ -452,34 +452,35 @@
 <body class="page-transition">
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h2 class="sidebar-title">ぼりんの菜单</h2>
+            <h2 class="sidebar-title" data-i18n="sidebarTitle">ぼりんの菜单</h2>
             <button class="close-btn" id="closeSidebar"><i class="fas fa-times"></i></button>
         </div>
         <div class="sidebar-menu">
-            <div class="menu-item" onclick="navigateTo('bilibili.html')"><i class="fab fa-bilibili bilibili-icon"></i><span>B站热门视频</span></div>
-            <div class="menu-item" onclick="navigateTo('post.html')"><i class="fas fa-newspaper"></i><span>帖子动态</span></div>
-            <div class="menu-item" onclick="navigateTo('settings.html')"><i class="fas fa-cog"></i><span>设置</span></div>
-            <div class="menu-item" onclick="navigateTo('about.html')"><i class="fas fa-info-circle"></i><span>关于我们</span></div>
+            <div class="menu-item" onclick="navigateTo('bilibili.html')"><i class="fab fa-bilibili bilibili-icon"></i><span data-i18n="menuBilibili">B站热门视频</span></div>
+            <div class="menu-item" onclick="navigateTo('post.html')"><i class="fas fa-newspaper"></i><span data-i18n="menuPost">帖子动态</span></div>
+            <div class="menu-item" onclick="navigateTo('settings.html')"><i class="fas fa-cog"></i><span data-i18n="menuSettings">设置</span></div>
+            <div class="menu-item" onclick="navigateTo('about.html')"><i class="fas fa-info-circle"></i><span data-i18n="menuAbout">关于我们</span></div>
         </div>
-        <div class="sidebar-footer" style="margin-top: auto; padding: 18px 0; text-align: center; color: var(--text-secondary);"><p>更多功能开发中...</p></div>
+        <div class="sidebar-footer" style="margin-top: auto; padding: 18px 0; text-align: center; color: var(--text-secondary);"><p data-i18n="moreSoon">更多功能开发中...</p></div>
     </div>
     <div class="overlay" id="overlay"></div>
-    <div class="notification" id="notification"><i class="fas fa-info-circle"></i><span id="notification-text">正在打开B站APP...</span></div>
+    <div class="notification" id="notification"><i class="fas fa-info-circle"></i><span id="notification-text" data-i18n="openingApp">正在打开B站APP...</span></div>
     <header>
         <button class="menu-btn" id="menuToggle"><i class="fas fa-bars"></i></button>
-        <h1 class="title">B站热门视频</h1>
+        <h1 class="title" data-i18n="biliPageTitle">B站热门视频</h1>
         <button class="menu-btn" id="themeToggle" onclick="toggleTheme()"><i class="fas fa-sun"></i></button>
     </header>
     <main>
-        <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> 返回首页</a>
-        <h2 class="page-title">全站最热 TOP 10</h2>
+        <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> <span data-i18n="backHome">返回首页</span></a>
+        <h2 class="page-title" data-i18n="biliTopTitle">全站最热 TOP 10</h2>
         <div class="videos-container" id="videosContainer">
-            <div class="loading"><i class="fas fa-spinner"></i><p>加载中...</p></div>
+            <div class="loading"><i class="fas fa-spinner"></i><p data-i18n="loading">加载中...</p></div>
         </div>
     </main>
     <footer>
-        <div class="copyright">© 2026 ぼりんの网站 | B站热门视频功能</div>
+        <div class="copyright" data-i18n="footerBilibili">© 2026 ぼりんの网站 | B站热门视频功能</div>
     </footer>
+    <script src="i18n.js"></script>
     <script>
         // ============ 主题管理 ============
         function getBeijingHour() {
@@ -548,6 +549,7 @@
         }
 
         initTheme();
+        initI18n();
         const savedSeed = getCookie('seed');
         if (savedSeed) applySeed(savedSeed);
 
@@ -618,7 +620,7 @@
         }
         function renderVideos(videos) {
             if (videos.length === 0) {
-                videosContainer.innerHTML = '<div class="loading"><i class="fas fa-exclamation-circle"></i><p>无法获取B站热门视频数据</p><button class="refresh-btn" onclick="loadVideos()"><i class="fas fa-sync-alt"></i> 重新加载</button></div>';
+                videosContainer.innerHTML = '<div class="loading"><i class="fas fa-exclamation-circle"></i><p>' + t('biliFetchError') + '</p><button class="refresh-btn" onclick="loadVideos()"><i class="fas fa-sync-alt"></i> ' + t('reload') + '</button></div>';
                 return;
             }
             let html = '';
@@ -631,12 +633,12 @@
             });
         }
         async function loadVideos() {
-            videosContainer.innerHTML = '<div class="loading"><i class="fas fa-spinner"></i><p>加载中...</p></div>';
+            videosContainer.innerHTML = '<div class="loading"><i class="fas fa-spinner"></i><p>' + t('loading') + '</p></div>';
             const videos = await fetchBilibiliHot();
             renderVideos(videos);
         }
         function openBilibiliVideo(bvid, title) {
-            notificationText.textContent = '正在打开: ' + title;
+            notificationText.textContent = t('openingVideo') + title;
             notification.classList.add('show');
             try { window.location.href = 'bilibili://video/' + bvid; } catch (e) {}
             setTimeout(function() {

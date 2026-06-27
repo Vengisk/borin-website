@@ -328,36 +328,37 @@
 <body class="page-transition">
     <header>
         <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
-        <h1 class="title">搜索</h1>
+        <h1 class="title" data-i18n="search">搜索</h1>
         <button class="menu-btn" onclick="location.href='index.html'"><i class="fas fa-home"></i></button>
     </header>
 
     <main>
         <div class="search-container">
             <div class="search-box">
-                <input type="text" class="search-input" id="searchInput" placeholder="搜索功能、帖子、标签..." autofocus>
+                <input type="text" class="search-input" id="searchInput" data-i18n-placeholder="searchPlaceholder" placeholder="搜索功能、帖子、标签..." autofocus>
                 <button class="search-btn" onclick="performSearch()"><i class="fas fa-search"></i></button>
             </div>
 
             <div class="search-tips">
-                <h3><i class="fas fa-lightbulb"></i> 搜索提示</h3>
-                <p>• 输入关键词搜索网站功能和帖子内容<br>• 使用 #标签 搜索特定标签的帖子<br>• 支持搜索：设置、B站视频、关于、帖子标题、帖子内容、标签</p>
+                <h3><i class="fas fa-lightbulb"></i> <span data-i18n="searchTips">搜索提示</span></h3>
+                <p data-i18n="searchTipsContent">• 输入关键词搜索网站功能和帖子内容<br>• 使用 #标签 搜索特定标签的帖子<br>• 支持搜索：设置、B站视频、关于、帖子标题、帖子内容、标签</p>
             </div>
 
             <div class="results-section">
-                <h3 class="results-title"><i class="fas fa-search"></i> 搜索结果 <span id="resultCount"></span></h3>
+                <h3 class="results-title"><i class="fas fa-search"></i> <span data-i18n="searchResults">搜索结果</span> <span id="resultCount"></span></h3>
                 <div id="resultsContent">
-                    <div class="no-results"><i class="fas fa-hand-point-up"></i><p>输入关键词开始搜索</p></div>
+                    <div class="no-results"><i class="fas fa-hand-point-up"></i><p data-i18n="startSearch">输入关键词开始搜索</p></div>
                 </div>
             </div>
         </div>
     </main>
 
     <footer>
-        <div class="time-display"><i class="fas fa-clock time-icon"></i><span class="time-label">北京时间：</span><span class="time-value" id="beijing-time">00:00:00</span></div>
-        <div class="copyright">© 2026 ぼりんの网站 | 搜索页面</div>
+        <div class="time-display"><i class="fas fa-clock time-icon"></i><span class="time-label" data-i18n="beijingTime">北京时间：</span><span class="time-value" id="beijing-time">00:00:00</span></div>
+        <div class="copyright" data-i18n="footerSearch">© 2026 ぼりんの网站 | 搜索页面</div>
     </footer>
 
+    <script src="i18n.js"></script>
     <script>
         // ============ 配置 ============
         const API_POSTS = '/api/posts';
@@ -421,6 +422,7 @@
         }
 
         initTheme();
+        initI18n();
         const savedSeed = getCookie('seed');
         if (savedSeed) applySeed(savedSeed);
 
@@ -441,7 +443,7 @@
             const countSpan = document.getElementById('resultCount');
 
             if (!query) {
-                resultsDiv.innerHTML = '<div class="no-results"><i class="fas fa-hand-point-up"></i><p>输入关键词开始搜索</p></div>';
+                resultsDiv.innerHTML = '<div class="no-results"><i class="fas fa-hand-point-up"></i><p>' + t('startSearch') + '</p></div>';
                 countSpan.textContent = '';
                 return;
             }
@@ -467,10 +469,10 @@
                 }
             });
 
-            countSpan.textContent = `(${results.length} 条结果)`;
+            countSpan.textContent = `(${results.length} ${t('resultCount')})`;
 
             if (results.length === 0) {
-                resultsDiv.innerHTML = '<div class="no-results"><i class="fas fa-search"></i><p>未找到相关结果</p></div>';
+                resultsDiv.innerHTML = '<div class="no-results"><i class="fas fa-search"></i><p>' + t('noResults') + '</p></div>';
                 return;
             }
 
@@ -479,7 +481,7 @@
             const postResults = results.filter(r => r.type === 'post');
 
             if (menuResults.length > 0) {
-                html += '<div class="result-category"><h4><i class="fas fa-th-large"></i> 功能菜单</h4>';
+                html += '<div class="result-category"><h4><i class="fas fa-th-large"></i> ' + t('menuCategory') + '</h4>';
                 menuResults.forEach(r => {
                     html += '<div class="result-item" onclick="location.href=\'' + esc(r.item.url) + '\'"><i class="' + esc(r.item.icon) + '" style="color:' + esc(r.item.color) + '"></i><div class="result-item-content"><h5>' + esc(r.item.name) + '</h5><p>' + esc(r.item.desc) + '</p></div></div>';
                 });
@@ -487,7 +489,7 @@
             }
 
             if (postResults.length > 0) {
-                html += '<div class="result-category"><h4><i class="fas fa-newspaper"></i> 相关帖子</h4>';
+                html += '<div class="result-category"><h4><i class="fas fa-newspaper"></i> ' + t('relatedPosts') + '</h4>';
                 postResults.forEach(r => {
                     const tags = (r.item.tags || []).map(t => '<span class="result-tag">#' + esc(t) + '</span>').join(' ');
                     const content = r.item.content || '';

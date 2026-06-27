@@ -530,70 +530,70 @@
 <body class="page-transition">
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h2 class="sidebar-title">ぼりんの菜单</h2>
+            <h2 class="sidebar-title" data-i18n="sidebarTitle">ぼりんの菜单</h2>
             <button class="close-btn" onclick="closeSidebar()"><i class="fas fa-times"></i></button>
         </div>
         <div class="sidebar-menu">
-            <div class="menu-item" onclick="navigate('bilibili.html')"><i class="fab fa-bilibili bilibili-icon"></i><span>B站热门视频</span></div>
-            <div class="menu-item" onclick="navigate('post.html')"><i class="fas fa-newspaper"></i><span>帖子动态</span></div>
-            <div class="menu-item" onclick="navigate('settings.html')"><i class="fas fa-cog"></i><span>设置</span></div>
-            <div class="menu-item" onclick="navigate('about.html')"><i class="fas fa-info-circle"></i><span>关于我们</span></div>
+            <div class="menu-item" onclick="navigate('bilibili.html')"><i class="fab fa-bilibili bilibili-icon"></i><span data-i18n="menuBilibili">B站热门视频</span></div>
+            <div class="menu-item" onclick="navigate('post.html')"><i class="fas fa-newspaper"></i><span data-i18n="menuPost">帖子动态</span></div>
+            <div class="menu-item" onclick="navigate('settings.html')"><i class="fas fa-cog"></i><span data-i18n="menuSettings">设置</span></div>
+            <div class="menu-item" onclick="navigate('about.html')"><i class="fas fa-info-circle"></i><span data-i18n="menuAbout">关于我们</span></div>
         </div>
     </div>
     <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
-    <div class="loading-overlay" id="loading"><div class="loading-box"><i class="fas fa-spinner"></i><p id="loadingText">加载中...</p></div></div>
+    <div class="loading-overlay" id="loading"><div class="loading-box"><i class="fas fa-spinner"></i><p id="loadingText" data-i18n="loading">加载中...</p></div></div>
     <div class="toast" id="toast"></div>
     <button class="fab-btn" onclick="openEditor()"><i class="fas fa-pencil-alt"></i></button>
 
     <div class="modal" id="editorModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title" id="editorTitle">发布新帖子</h3>
+                <h3 class="modal-title" id="editorTitle" data-i18n="editorNewTitle">发布新帖子</h3>
                 <button class="modal-close" onclick="closeEditor()"><i class="fas fa-times"></i></button>
             </div>
             <div class="auth-section" id="authSection">
-                <p>请输入管理密码</p>
-                <input type="password" class="form-input" id="authKey" placeholder="输入密码..." style="max-width:300px;margin:0 auto;display:block">
-                <button class="submit-btn" style="max-width:200px;margin:15px auto 0;display:block" onclick="verifyKey()">验证</button>
+                <p data-i18n="enterPassword">请输入管理密码</p>
+                <input type="password" class="form-input" id="authKey" placeholder="输入密码..." data-i18n-placeholder="passwordPlaceholder" style="max-width:300px;margin:0 auto;display:block">
+                <button class="submit-btn" style="max-width:200px;margin:15px auto 0;display:block" onclick="verifyKey()" data-i18n="verify">验证</button>
             </div>
             <form id="postForm" style="display:none" onsubmit="submitPost(event)">
                 <input type="hidden" id="editPostId">
                 <div class="form-group">
-                    <label class="form-label">帖子标题</label>
-                    <input type="text" class="form-input" id="postTitle" placeholder="输入标题..." required>
+                    <label class="form-label" data-i18n="postTitleLabel">帖子标题</label>
+                    <input type="text" class="form-input" id="postTitle" placeholder="输入标题..." data-i18n-placeholder="titlePlaceholder" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">标签 (如: #日常 #技术)</label>
-                    <input type="text" class="form-input" id="postTags" placeholder="#日常 #分享...">
+                    <label class="form-label" data-i18n="tagsLabel">标签 (如: #日常 #技术)</label>
+                    <input type="text" class="form-input" id="postTags" placeholder="#日常 #分享..." data-i18n-placeholder="tagsPlaceholder">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">帖子内容</label>
-                    <textarea class="form-input form-textarea" id="postContent" placeholder="写下你的想法..." required></textarea>
+                    <label class="form-label" data-i18n="contentLabel">帖子内容</label>
+                    <textarea class="form-input form-textarea" id="postContent" placeholder="写下你的想法..." data-i18n-placeholder="contentPlaceholder" required></textarea>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">添加图片 (最多5张，可选)</label>
-                    <label class="add-image-btn"><i class="fas fa-image"></i> 选择图片<input type="file" id="imageInput" accept="image/*" multiple style="display:none" onchange="handleImages(event)"></label>
+                    <label class="form-label" data-i18n="addImageLabel">添加图片 (最多5张，可选)</label>
+                    <label class="add-image-btn"><i class="fas fa-image"></i> <span data-i18n="selectImage">选择图片</span><input type="file" id="imageInput" accept="image/*" multiple style="display:none" onchange="handleImages(event)"></label>
                     <div class="image-preview" id="imagePreview"></div>
                 </div>
-                <button type="submit" class="submit-btn" id="submitBtn">发布帖子</button>
+                <button type="submit" class="submit-btn" id="submitBtn" data-i18n="publishPost">发布帖子</button>
             </form>
         </div>
     </div>
 
     <header>
         <button class="menu-btn" onclick="openSidebar()"><i class="fas fa-bars"></i></button>
-        <h1 class="title">帖子动态</h1>
+        <h1 class="title" data-i18n="menuPost">帖子动态</h1>
         <button class="search-btn" onclick="location.href='search.html'"><i class="fas fa-search"></i></button>
     </header>
 
     <main>
         <div class="post-container">
             <div class="page-header">
-                <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> 返回首页</a>
-                <h2 class="page-title">我的帖子</h2>
+                <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> <span data-i18n="backHome">返回首页</span></a>
+                <h2 class="page-title" data-i18n="myPosts">我的帖子</h2>
             </div>
             <div class="tags-section">
-                <h3 class="tags-title"><i class="fas fa-tags"></i> 标签分类</h3>
+                <h3 class="tags-title"><i class="fas fa-tags"></i> <span data-i18n="tagsCategory">标签分类</span></h3>
                 <div class="tags-list" id="tagsList"></div>
             </div>
             <div class="posts-list" id="postsList"></div>
@@ -601,9 +601,10 @@
     </main>
 
     <footer>
-        <div class="copyright">© 2026 ぼりんの网站 | 帖子动态</div>
+        <div class="copyright" data-i18n="footerPost">© 2026 ぼりんの网站 | 帖子动态</div>
     </footer>
 
+    <script src="i18n.js"></script>
     <script>
         // ===== 配置：前端不再持有任何机密 =====
         const API_POSTS = '/api/posts';
@@ -628,7 +629,6 @@
         function showLoading(show, text = '加载中...') { document.getElementById('loadingText').textContent = text; document.getElementById('loading').style.display = show ? 'flex' : 'none'; }
         function showToast(msg, isError = false) { const t = document.getElementById('toast'); t.textContent = msg; t.className = 'toast show' + (isError ? ' error' : ''); setTimeout(() => t.classList.remove('show'), 2500); }
 
-        function getTimeAgo(d) { const diff = Date.now() - new Date(d).getTime(), m = Math.floor(diff/60000), h = Math.floor(diff/3600000), dd = Math.floor(diff/86400000); if(dd>30) return Math.floor(dd/30)+'个月前'; if(dd>0) return dd+'天前'; if(h>0) return h+'小时前'; if(m>0) return m+'分钟前'; return '刚刚'; }
         function formatDate(d) { const n = new Date(d); return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0')+' '+String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0'); }
         function extractTags(t) { return (t.match(/#[\u4e00-\u9fa5a-zA-Z0-9_]+/g) || []).map(x => x.substring(1)); }
 
@@ -668,12 +668,13 @@
         }
 
         initTheme();
+        initI18n();
         const savedSeed = getCookie('seed');
         if (savedSeed) applySeed(savedSeed);
 
         // ===== 数据操作 =====
         async function loadPosts() {
-            showLoading(true, '加载帖子...');
+            showLoading(true, t('loadingPosts'));
             const localPosts = JSON.parse(localStorage.getItem('borin_posts') || '[]');
             try {
                 const res = await fetch(API_POSTS);
@@ -694,7 +695,7 @@
 
         async function savePosts() {
             localStorage.setItem('borin_posts', JSON.stringify(posts));
-            if (!authToken) { showToast('请先验证密码', true); return false; }
+            if (!authToken) { showToast(t('verifyFirst'), true); return false; }
             try {
                 const res = await fetch(API_POSTS, {
                     method: 'PUT',
@@ -703,7 +704,7 @@
                 });
                 if (res.status === 401) {
                     isAuthenticated = false; authToken = null;
-                    showToast('登录已过期，请重新验证', true);
+                    showToast(t('authExpired'), true);
                     return false;
                 }
                 return res.ok;
@@ -720,14 +721,14 @@
 
         async function verifyKey() {
             const input = document.getElementById('authKey').value;
-            if (!input) return showToast('请输入密码', true);
+            if (!input) return showToast(t('enterPassword'), true);
             try {
                 const res = await fetch(API_VERIFY, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ password: input }),
                 });
-                if (!res.ok) return showToast('密码错误', true);
+                if (!res.ok) return showToast(t('wrongPassword'), true);
                 const d = await res.json();
                 authToken = d.token;
                 isAuthenticated = true;
@@ -735,15 +736,15 @@
                 document.getElementById('postForm').style.display = 'block';
                 document.getElementById('authKey').value = '';
             } catch (e) {
-                showToast('验证失败，请稍后重试', true);
+                showToast(t('verifyFailed'), true);
             }
         }
 
         function openEditor(id = null) {
             editingId = id;
             document.getElementById('editorModal').classList.add('show');
-            document.getElementById('editorTitle').textContent = id ? '编辑帖子' : '发布新帖子';
-            document.getElementById('submitBtn').textContent = id ? '保存修改' : '发布帖子';
+            document.getElementById('editorTitle').textContent = id ? t('editorEditTitle') : t('editorNewTitle');
+            document.getElementById('submitBtn').textContent = id ? t('saveChanges') : t('publishPost');
 
             if (id) {
                 const post = posts.find(p => p.id === id);
@@ -783,7 +784,7 @@
         function handleImages(e) {
             const files = e.target.files;
             for (let file of files) {
-                if (uploadedImages.length >= 5) { showToast('最多5张图片', true); break; }
+                if (uploadedImages.length >= 5) { showToast(t('maxImages'), true); break; }
                 const reader = new FileReader();
                 reader.onload = ev => { uploadedImages.push(ev.target.result); renderImagePreview(); };
                 reader.readAsDataURL(file);
@@ -802,8 +803,8 @@
             const tc = {};
             posts.forEach(p => (p.tags || []).forEach(t => tc[t] = (tc[t] || 0) + 1));
             const list = document.getElementById('tagsList');
-            if (!Object.keys(tc).length) { list.innerHTML = '<span style="color:var(--text-secondary)">暂无标签</span>'; return; }
-            let html = '<div class="tag-item' + (currentFilter === null ? ' active' : '') + '" onclick="filterByTag(null)">全部 <span class="tag-count">' + posts.length + '</span></div>';
+            if (!Object.keys(tc).length) { list.innerHTML = '<span style="color:var(--text-secondary)">' + t('noTags') + '</span>'; return; }
+            let html = '<div class="tag-item' + (currentFilter === null ? ' active' : '') + '" onclick="filterByTag(null)">' + t('all') + ' <span class="tag-count">' + posts.length + '</span></div>';
             for (let t in tc) {
                 html += '<div class="tag-item' + (currentFilter === t ? ' active' : '') + '" onclick="filterByTag(this.dataset.tag)" data-tag="' + esc(t) + '">#' + esc(t) + ' <span class="tag-count">' + tc[t] + '</span></div>';
             }
@@ -815,7 +816,7 @@
         function renderPosts() {
             const list = document.getElementById('postsList');
             let filtered = currentFilter ? posts.filter(p => (p.tags || []).includes(currentFilter)) : posts;
-            if (!filtered.length) { list.innerHTML = '<div class="no-posts"><i class="fas fa-inbox"></i><p>暂无帖子</p><p style="font-size:1rem;margin-top:10px">点击右下角按钮发布吧！</p></div>'; return; }
+            if (!filtered.length) { list.innerHTML = '<div class="no-posts"><i class="fas fa-inbox"></i><p>' + t('noPosts') + '</p><p style="font-size:1rem;margin-top:10px">' + t('noPostsHint') + '</p></div>'; return; }
             filtered = filtered.slice().sort((a, b) => new Date(b.date) - new Date(a.date));
             list.innerHTML = filtered.map(p => {
                 const content = p.content || '';
@@ -828,23 +829,23 @@
         function openPost(id) { location.href = 'p/?id=' + id; }
 
         async function deletePost(id) {
-            if (!isAuthenticated) { showToast('请先验证密码', true); return; }
-            if (!confirm('确定要删除这篇帖子吗？')) return;
+            if (!isAuthenticated) { showToast(t('verifyFirst'), true); return; }
+            if (!confirm(t('confirmDelete'))) return;
             posts = posts.filter(p => p.id !== id);
             await savePosts();
             renderTags();
             renderPosts();
-            showToast('删除成功');
+            showToast(t('deleteSuccess'));
         }
 
         async function submitPost(e) {
             e.preventDefault();
-            if (!isAuthenticated) return showToast('请先验证密码', true);
+            if (!isAuthenticated) return showToast(t('verifyFirst'), true);
             const title = document.getElementById('postTitle').value.trim();
             const content = document.getElementById('postContent').value.trim();
-            if (!title || !content) return showToast('请填写标题和内容', true);
+            if (!title || !content) return showToast(t('fillTitleContent'), true);
 
-            showLoading(true, editingId ? '保存中...' : '发布中...');
+            showLoading(true, editingId ? t('saving') : t('publishing'));
 
             const editId = document.getElementById('editPostId').value;
             if (editId) {
@@ -868,7 +869,7 @@
             closeEditor();
             renderTags();
             renderPosts();
-            showToast(editingId ? '修改成功！' : '发布成功！');
+            showToast(editingId ? t('editSuccess') : t('publishSuccess'));
         }
 
         // ===== 涟漪反馈 =====

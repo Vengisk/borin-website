@@ -102,53 +102,53 @@
 <body class="page-transition">
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h2 class="sidebar-title">ぼりんの菜单</h2>
+            <h2 class="sidebar-title" data-i18n="sidebarTitle">ぼりんの菜单</h2>
             <button class="close-btn" id="closeSidebar"><i class="fas fa-times"></i></button>
         </div>
         <div class="sidebar-menu">
-            <div class="menu-item" onclick="navigateTo('bilibili.html')"><i class="fab fa-bilibili bilibili-icon"></i><span>B站热门视频</span></div>
-            <div class="menu-item" onclick="navigateTo('post.html')"><i class="fas fa-newspaper"></i><span>帖子动态</span></div>
-            <div class="menu-item" onclick="navigateTo('settings.html')"><i class="fas fa-cog"></i><span>设置</span></div>
-            <div class="menu-item" onclick="navigateTo('about.html')"><i class="fas fa-info-circle"></i><span>关于我们</span></div>
+            <div class="menu-item" onclick="navigateTo('bilibili.html')"><i class="fab fa-bilibili bilibili-icon"></i><span data-i18n="menuBilibili">B站热门视频</span></div>
+            <div class="menu-item" onclick="navigateTo('post.html')"><i class="fas fa-newspaper"></i><span data-i18n="menuPost">帖子动态</span></div>
+            <div class="menu-item" onclick="navigateTo('settings.html')"><i class="fas fa-cog"></i><span data-i18n="menuSettings">设置</span></div>
+            <div class="menu-item" onclick="navigateTo('about.html')"><i class="fas fa-info-circle"></i><span data-i18n="menuAbout">关于我们</span></div>
         </div>
-        <div class="sidebar-footer" style="margin-top: auto; padding: 18px 0; text-align: center; color: var(--text-secondary);"><p>更多功能开发中...</p></div>
+        <div class="sidebar-footer" style="margin-top: auto; padding: 18px 0; text-align: center; color: var(--text-secondary);"><p data-i18n="moreSoon">更多功能开发中...</p></div>
     </div>
     <div class="overlay" id="overlay"></div>
     <header>
         <button class="menu-btn" id="menuToggle"><i class="fas fa-bars"></i></button>
-        <h1 class="title">关于我们</h1>
+        <h1 class="title" data-i18n="menuAbout">关于我们</h1>
         <button class="search-btn" id="searchToggle"><i class="fas fa-search"></i></button>
     </header>
     <main>
-        <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> 返回首页</a>
+        <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> <span data-i18n="backHome">返回首页</span></a>
         <div class="about-container">
-            <h2 class="about-title">关于ぼりんの网站</h2>
+            <h2 class="about-title" data-i18n="aboutTitle">关于ぼりんの网站</h2>
             <div class="creator-info">
                 <div class="creator-icon"><i class="fas fa-user"></i></div>
-                <h3 class="creator-name">ぼりん</h3>
-                <p class="creator-title">网站创始人 & 唯一开发者</p>
+                <h3 class="creator-name" data-i18n="creatorName">ぼりん</h3>
+                <p class="creator-title" data-i18n="creatorTitle">网站创始人 & 唯一开发者</p>
             </div>
             <div class="about-content">
-                <p>本网站由 <strong>ぼりん</strong> 一人独立设计、开发和维护。</p>
-                <p>从创意构思到代码实现，从界面设计到功能开发，全部由ぼりん一人完成。</p>
-                <p>ぼりん热爱编程与设计，致力于创造有趣且实用的网络应用。</p>
+                <p data-i18n="aboutContent1">本网站由 <strong>ぼりん</strong> 一人独立设计、开发和维护。</p>
+                <p data-i18n="aboutContent2">从创意构思到代码实现，从界面设计到功能开发，全部由ぼりん一人完成。</p>
+                <p data-i18n="aboutContent3">ぼりん热爱编程与设计，致力于创造有趣且实用的网络应用。</p>
             </div>
             <div class="qq-group">
-                <p>如果您想加入开发或赞助本项目</p>
-                <p>欢迎加入我们的QQ群：</p>
+                <p data-i18n="qqGroupIntro">如果您想加入开发或赞助本项目</p>
+                <p data-i18n="qqGroupJoin">欢迎加入我们的QQ群：</p>
                 <p class="qq-number">882670097</p>
             </div>
-            <p>感谢您对ぼりんの网站的支持！</p>
+            <p data-i18n="thanksSupport">感谢您对ぼりんの网站的支持！</p>
         </div>
     </main>
     <footer>
-        <div class="copyright">© 2026 ぼりんの网站 | 关于我们页面</div>
+        <div class="copyright" data-i18n="footerAbout">© 2026 ぼりんの网站 | 关于我们页面</div>
     </footer>
+    <script src="i18n.js"></script>
     <script>
         function getBeijingHour() { const now = new Date(); const utc = now.getTime() + now.getTimezoneOffset() * 60000; return new Date(utc + 28800000).getHours(); }
         function applyTheme(t) { document.documentElement.setAttribute('data-theme', t); }
         function initTheme() { const s = getCookie('theme'); applyTheme(s || (getBeijingHour() >= 6 && getBeijingHour() < 18 ? 'light' : 'dark')); }
-        function getCookie(n) { const c = document.cookie.split('; ').find(r => r.startsWith(n + '=')); return c ? decodeURIComponent(c.split('=')[1]) : null; }
 
         // MD3 动态配色（继承种子色）
         function hexToHsl(hex) {
@@ -176,6 +176,7 @@
         }
 
         initTheme();
+        initI18n();
         const savedSeed = getCookie('seed');
         if (savedSeed) applySeed(savedSeed);
 

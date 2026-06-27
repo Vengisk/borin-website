@@ -569,79 +569,10 @@
         <div class="copyright" data-i18n="footer">© 2026 ぼりんの网站 | 设置页面</div>
     </footer>
 
+    <script src="i18n.js"></script>
     <script>
-        // ============================================================
-        //  i18n 多语言字典
-        // ============================================================
-        const I18N = {
-            'zh': {
-                pageTitle: '系统设置', settingsTitle: '系统设置', backHome: '返回首页',
-                appearance: '外观主题', light: '浅色模式', dark: '深色模式', auto: '自动切换',
-                language: '语言设置', display: '显示设置',
-                showCovers: '显示视频封面', showCoversDesc: '在视频列表中显示封面图片',
-                animations: '动画效果', animationsDesc: '启用页面过渡动画',
-                dataMgmt: '数据管理', clearCache: '清除缓存', clearCacheDesc: '清除本地存储的设置和数据',
-                save: '保存设置', info1: '设置将保存在浏览器Cookies中', info2: '清除浏览器数据会重置所有设置',
-                footer: '© 2026 ぼりんの网站 | 设置页面', saved: '设置已保存',
-                savedMsg: '设置已保存！', cacheCleared: '缓存已清除！',
-                menuBilibili: 'B站热门视频', menuPost: '帖子动态', menuSettings: '设置', menuAbout: '关于我们', moreSoon: '更多功能开发中...'
-            },
-            'zh-tw': {
-                pageTitle: '系統設定', settingsTitle: '系統設定', backHome: '返回首頁',
-                appearance: '外觀主題', light: '淺色模式', dark: '深色模式', auto: '自動切換',
-                language: '語言設定', display: '顯示設定',
-                showCovers: '顯示影片封面', showCoversDesc: '在影片清單中顯示封面圖片',
-                animations: '動畫效果', animationsDesc: '啟用頁面過渡動畫',
-                dataMgmt: '資料管理', clearCache: '清除快取', clearCacheDesc: '清除本機儲存的設定與資料',
-                save: '儲存設定', info1: '設定將儲存在瀏覽器 Cookies 中', info2: '清除瀏覽器資料會重置所有設定',
-                footer: '© 2026 ぼりんの網站 | 設定頁面', saved: '設定已儲存',
-                savedMsg: '設定已儲存！', cacheCleared: '快取已清除！',
-                menuBilibili: 'B站熱門影片', menuPost: '貼文動態', menuSettings: '設定', menuAbout: '關於我們', moreSoon: '更多功能開發中...'
-            },
-            'en': {
-                pageTitle: 'Settings', settingsTitle: 'Settings', backHome: 'Back to Home',
-                appearance: 'Appearance', light: 'Light', dark: 'Dark', auto: 'Auto',
-                language: 'Language', display: 'Display',
-                showCovers: 'Show video covers', showCoversDesc: 'Display cover images in video lists',
-                animations: 'Animations', animationsDesc: 'Enable page transition animations',
-                dataMgmt: 'Data Management', clearCache: 'Clear Cache', clearCacheDesc: 'Clear locally stored settings and data',
-                save: 'Save Settings', info1: 'Settings are stored in browser cookies', info2: 'Clearing browser data resets all settings',
-                footer: '© 2026 ぼりんの网站 | Settings', saved: 'Settings saved',
-                savedMsg: 'Settings saved!', cacheCleared: 'Cache cleared!',
-                menuBilibili: 'Bilibili Hot', menuPost: 'Posts', menuSettings: 'Settings', menuAbout: 'About', moreSoon: 'More features coming...'
-            },
-            'ja': {
-                pageTitle: '設定', settingsTitle: '設定', backHome: 'ホームに戻る',
-                appearance: '外観テーマ', light: 'ライト', dark: 'ダーク', auto: '自動',
-                language: '言語設定', display: '表示設定',
-                showCovers: '動画のサムネイルを表示', showCoversDesc: '動画リストにサムネイルを表示します',
-                animations: 'アニメーション', animationsDesc: 'ページ遷移アニメーションを有効にする',
-                dataMgmt: 'データ管理', clearCache: 'キャッシュを消去', clearCacheDesc: 'ローカルに保存された設定とデータを消去します',
-                save: '設定を保存', info1: '設定はブラウザの Cookie に保存されます', info2: 'ブラウザのデータを消去するとすべての設定がリセットされます',
-                footer: '© 2026 ぼりんの网站 | 設定ページ', saved: '設定を保存しました',
-                savedMsg: '設定を保存しました！', cacheCleared: 'キャッシュを消去しました！',
-                menuBilibili: 'Bilibili 人気動画', menuPost: '投稿', menuSettings: '設定', menuAbout: '私たちについて', moreSoon: '他の機能は開発中...'
-            }
-        };
-        const LANG_HTML = { 'zh': 'zh-CN', 'zh-tw': 'zh-TW', 'en': 'en', 'ja': 'ja' };
-
-        function applyLanguage(lang) {
-            const dict = I18N[lang] || I18N['zh'];
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.dataset.i18n;
-                if (dict[key]) el.textContent = dict[key];
-            });
-            document.documentElement.setAttribute('lang', LANG_HTML[lang] || 'zh-CN');
-            window.__currentLang = lang;
-        }
-        function changeLanguage(lang) {
-            applyLanguage(lang);
-            setCookie('language', lang, 365);
-        }
-        function t(key) {
-            const dict = I18N[window.__currentLang] || I18N['zh'];
-            return dict[key] || key;
-        }
+        // 语言切换由共享 i18n.js 的 changeLanguage 处理（写入 cookie + 应用）
+        // 下拉框 onchange 直接调用全局 changeLanguage(this.value)
 
         // ============================================================
         //  主题管理
@@ -781,6 +712,7 @@
         }
 
         loadSettings();
+        initI18n();
     </script>
 </body>
 </html>
