@@ -2,20 +2,20 @@
 <html lang="zh-CN">
 <head>
     <script>
+    // 早期主题 + 动态配色注入：在首次绘制前应用，避免闪烁
     (function() {
-        var theme = "dark";
-        var c = document.cookie.split("; ");
-        for (var i = 0; i < c.length; i++) {
-            if (c[i].indexOf("theme=") === 0) {
-                theme = decodeURIComponent(c[i].substring(6));
-                break;
+        function readCookie(name) {
+            var c = document.cookie.split("; ");
+            for (var i = 0; i < c.length; i++) {
+                if (c[i].indexOf(name + "=") === 0) return decodeURIComponent(c[i].substring(name.length + 1));
             }
+            return null;
         }
-        if (c.every(function(x) { return x.indexOf("theme=") !== 0; })) {
+        var theme = readCookie("theme");
+        if (!theme) {
             var now = new Date();
             var utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-            var bj = new Date(utc + 28800000);
-            var hour = bj.getHours();
+            var hour = new Date(utc + 28800000).getHours();
             theme = (hour >= 6 && hour < 18) ? "light" : "dark";
         }
         document.documentElement.setAttribute("data-theme", theme);
@@ -25,57 +25,304 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>帖子详情 - ぼりんの网站</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../animations.css">
     <script src="../protect.js"></script>
     <style>
-        :root { --bg-card: rgba(255, 255, 255, 0.85); --text-primary: #3d2c29; --text-secondary: #8b7068; --accent: #fb7299; --border: rgba(251, 114, 153, 0.15); --shadow: rgba(251, 114, 153, 0.08); --gradient-1: #fff0eb; --gradient-2: #ffe4dc; --gradient-3: #ffd6cc; --gradient-4: #ffeee8; --header-bg: rgba(255, 255, 255, 0.92); --footer-bg: rgba(255, 248, 245, 0.92); --time-bg: rgba(255, 230, 220, 0.7); --input-bg: rgba(230, 230, 240, 0.6); }
-        [data-theme="dark"] { --bg-card: rgba(20, 25, 50, 0.6); --text-primary: #f0f0f0; --text-secondary: #a0a0c0; --gradient-1: #1a1a2e; --gradient-2: #16213e; --gradient-3: #0f3460; --gradient-4: #1a1a2e; --header-bg: rgba(10, 10, 20, 0.7); --footer-bg: rgba(10, 10, 20, 0.85); --time-bg: rgba(30, 40, 70, 0.5); --input-bg: rgba(30, 40, 70, 0.5); }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { min-height: 100vh; background: linear-gradient(-45deg, var(--gradient-1), var(--gradient-2), var(--gradient-3), var(--gradient-4)); background-size: 400% 400%; animation: gradientBG 15s ease infinite; color: var(--text-primary); display: flex; flex-direction: column; }
-        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-        header { display: flex; justify-content: space-between; align-items: center; padding: 20px 30px; background: var(--header-bg); backdrop-filter: blur(10px); box-shadow: 0 4px 20px var(--shadow); position: sticky; top: 0; z-index: 100; }
-        .menu-btn, .search-btn { background: none; border: none; color: var(--text-primary); font-size: 1.8rem; cursor: pointer; padding: 10px; border-radius: 50%; }
-        .title { font-size: 2.2rem; font-weight: 700; letter-spacing: 2px; background: linear-gradient(to right, #ff7e5f, #feb47b, #86a8e7, #91eae4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        main { flex: 1; padding: 40px 20px; display: flex; flex-direction: column; align-items: center; }
+        /* ============================================================
+           MD3 + Liquid Glass 融合设计系统
+        ============================================================ */
+        :root {
+            --seed: #fb7299;
+            --bg-grad-1: #fff0f4;
+            --bg-grad-2: #ffe9ef;
+            --bg-grad-3: #f3e9ff;
+            --bg-grad-4: #e9f3ff;
+
+            --md-primary: #fb7299;
+            --md-primary-hover: #e55a80;
+            --md-on-primary: #ffffff;
+            --md-secondary: #86a8e7;
+            --md-tertiary: #feb47b;
+
+            --text-primary: #2a1f24;
+            --text-secondary: #6b5a60;
+
+            --glass-fill: rgba(255, 255, 255, 0.45);
+            --glass-fill-strong: rgba(255, 255, 255, 0.6);
+            --glass-stroke: rgba(255, 255, 255, 0.7);
+            --glass-stroke-soft: rgba(255, 255, 255, 0.35);
+            --glass-shadow: rgba(180, 120, 140, 0.18);
+            --glass-highlight: rgba(255, 255, 255, 0.9);
+            --glass-tint: rgba(251, 114, 153, 0.06);
+            --blur: 18px;
+
+            --shape-xs: 10px;
+            --shape-sm: 16px;
+            --shape-md: 22px;
+            --shape-lg: 28px;
+            --shape-xl: 36px;
+            --shape-full: 999px;
+
+            --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --spring-soft: cubic-bezier(0.2, 0.9, 0.3, 1.2);
+            --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+        }
+        [data-theme="dark"] {
+            --bg-grad-1: #14121f;
+            --bg-grad-2: #181430;
+            --bg-grad-3: #0f1b3a;
+            --bg-grad-4: #1a1430;
+
+            --md-primary: #fb7299;
+            --md-primary-hover: #ff8fad;
+            --md-on-primary: #2a0e18;
+            --md-secondary: #9db8ff;
+            --md-tertiary: #ffc99b;
+
+            --text-primary: #f2eef0;
+            --text-secondary: #b7adc4;
+
+            --glass-fill: rgba(40, 44, 70, 0.4);
+            --glass-fill-strong: rgba(50, 54, 84, 0.55);
+            --glass-stroke: rgba(160, 175, 230, 0.4);
+            --glass-stroke-soft: rgba(160, 175, 230, 0.15);
+            --glass-shadow: rgba(0, 0, 0, 0.45);
+            --glass-highlight: rgba(200, 215, 255, 0.5);
+            --glass-tint: rgba(120, 140, 220, 0.08);
+            --blur: 22px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Quicksand', 'Noto Sans SC', 'Segoe UI', Tahoma, sans-serif; }
+
+        body {
+            min-height: 100vh;
+            position: relative;
+            background: var(--bg-grad-1);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            transition: color 0.4s var(--ease-standard);
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            inset: -20%;
+            z-index: -2;
+            background:
+                radial-gradient(circle at 20% 25%, var(--bg-grad-3), transparent 45%),
+                radial-gradient(circle at 80% 20%, var(--bg-grad-4), transparent 45%),
+                radial-gradient(circle at 70% 80%, var(--bg-grad-2), transparent 50%),
+                radial-gradient(circle at 25% 75%, var(--bg-grad-1), transparent 50%),
+                linear-gradient(135deg, var(--bg-grad-1), var(--bg-grad-2));
+            background-size: 200% 200%;
+            animation: auroraFlow 22s ease-in-out infinite;
+            filter: saturate(1.1);
+            transition: background 0.6s ease;
+        }
+        @keyframes auroraFlow { 0% { background-position: 0% 0%; } 50% { background-position: 100% 100%; } 100% { background-position: 0% 0%; } }
+
+        /* ================= 顶部栏 ================= */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 22px;
+            margin: 14px;
+            border-radius: var(--shape-xl);
+            background: var(--glass-fill-strong);
+            backdrop-filter: blur(var(--blur)) saturate(180%);
+            -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
+            border: 1px solid var(--glass-stroke-soft);
+            box-shadow: 0 8px 32px var(--glass-shadow), inset 0 1px 0 var(--glass-highlight);
+            position: sticky;
+            top: 14px;
+            z-index: 100;
+        }
+        .menu-btn, .search-btn {
+            background: var(--glass-tint);
+            border: 1px solid var(--glass-stroke-soft);
+            color: var(--text-primary);
+            font-size: 1.4rem;
+            cursor: pointer;
+            width: 48px;
+            height: 48px;
+            display: grid;
+            place-items: center;
+            border-radius: var(--shape-full);
+            transition: transform 0.45s var(--spring), background 0.3s ease, border-radius 0.4s var(--spring);
+            position: relative;
+            overflow: hidden;
+        }
+        .menu-btn:hover, .search-btn:hover { background: var(--md-primary); color: var(--md-on-primary); transform: scale(1.08); border-radius: var(--shape-md); }
+        .menu-btn:active, .search-btn:active { transform: scale(0.92); }
+        .title {
+            font-size: 1.9rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            background: linear-gradient(110deg, var(--md-primary), var(--md-tertiary), var(--md-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        main { flex: 1; padding: 20px 20px 30px; display: flex; flex-direction: column; align-items: center; }
         .container { max-width: 800px; width: 100%; }
-        .back-btn { display: inline-flex; align-items: center; background: var(--bg-card); color: var(--text-primary); padding: 10px 20px; border-radius: 30px; text-decoration: none; border: 1px solid var(--border); margin-bottom: 20px; }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            background: var(--glass-fill);
+            backdrop-filter: blur(var(--blur)) saturate(180%);
+            -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
+            color: var(--text-primary);
+            font-weight: 600;
+            padding: 11px 22px;
+            border-radius: var(--shape-full);
+            text-decoration: none;
+            border: 1px solid var(--glass-stroke-soft);
+            box-shadow: inset 0 1px 0 var(--glass-highlight);
+            margin-bottom: 20px;
+            transition: transform 0.45s var(--spring), background 0.3s ease, border-radius 0.4s var(--spring);
+        }
+        .back-btn:hover { background: var(--glass-tint); transform: translateX(-6px); border-radius: var(--shape-md); border-color: var(--md-primary); }
         .back-btn i { margin-right: 8px; }
-        .post-card { background: var(--bg-card); border-radius: 20px; padding: 30px; border: 1px solid var(--border); margin-bottom: 20px; }
-        .post-header { margin-bottom: 25px; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
-        .post-title { font-size: 2rem; margin-bottom: 15px; }
-        .post-meta { display: flex; flex-wrap: wrap; gap: 15px; color: var(--text-secondary); font-size: 0.9rem; }
-        .post-tags { display: flex; gap: 8px; }
-        .post-tag { color: #fb7299; }
-        .post-body { line-height: 1.8; font-size: 1.1rem; white-space: pre-wrap; }
+
+        .post-card, .comments-section {
+            background: var(--glass-fill);
+            backdrop-filter: blur(var(--blur)) saturate(180%);
+            -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
+            border: 1px solid var(--glass-stroke-soft);
+            box-shadow: 0 8px 32px var(--glass-shadow), inset 0 1px 0 var(--glass-highlight);
+            border-radius: var(--shape-xl);
+            padding: 32px;
+            margin-bottom: 20px;
+            animation: cardReveal 0.55s var(--spring-soft) both;
+        }
+        @keyframes cardReveal { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: translateY(0); } }
+        .comments-section { animation-delay: 0.08s; }
+
+        .post-header { margin-bottom: 25px; border-bottom: 1px solid var(--glass-stroke-soft); padding-bottom: 20px; }
+        .post-title { font-size: 1.9rem; font-weight: 700; margin-bottom: 15px; }
+        .post-meta { display: flex; flex-wrap: wrap; gap: 15px; align-items: center; color: var(--text-secondary); font-size: 0.9rem; }
+        .post-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+        .post-tag { color: var(--md-primary); font-weight: 600; }
+        .post-body { line-height: 1.8; font-size: 1.08rem; white-space: pre-wrap; word-break: break-word; }
         .post-images { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 25px; }
-        .post-images img { max-width: 100%; border-radius: 15px; cursor: pointer; }
-        .comments-section { background: var(--bg-card); border-radius: 20px; padding: 30px; border: 1px solid var(--border); }
-        .comments-title { font-size: 1.5rem; color: #feb47b; margin-bottom: 20px; }
-        .comment-form { margin-bottom: 25px; padding-bottom: 25px; border-bottom: 1px solid var(--border); }
-        .form-input { width: 100%; padding: 12px 15px; background: var(--input-bg); border: 2px solid var(--border); border-radius: 10px; color: var(--text-primary); font-size: 1rem; margin-bottom: 15px; }
-        .form-input:focus { outline: none; border-color: #fb7299; }
+        .post-images img { max-width: 100%; border-radius: var(--shape-md); cursor: pointer; border: 1px solid var(--glass-stroke-soft); transition: transform 0.4s var(--spring); }
+        .post-images img:hover { transform: scale(1.02); }
+
+        .comments-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--md-tertiary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .comment-form { margin-bottom: 25px; padding-bottom: 25px; border-bottom: 1px solid var(--glass-stroke-soft); }
+        .form-input {
+            width: 100%;
+            padding: 13px 16px;
+            background: var(--glass-tint);
+            border: 2px solid var(--glass-stroke-soft);
+            border-radius: var(--shape-md);
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: inherit;
+            margin-bottom: 15px;
+            transition: border-color 0.3s ease, border-radius 0.4s var(--spring);
+        }
+        .form-input:focus { outline: none; border-color: var(--md-primary); border-radius: var(--shape-lg); }
         .form-textarea { min-height: 100px; resize: vertical; }
-        .submit-btn { padding: 12px 30px; background: linear-gradient(135deg, #fb7299, #ff7e5f); color: white; border: none; border-radius: 10px; font-size: 1rem; cursor: pointer; }
-        .comments-list { display: flex; flex-direction: column; gap: 15px; }
-        .comment-item { background: var(--input-bg); border-radius: 15px; padding: 20px; }
-        .comment-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
-        .comment-author { font-weight: 600; color: #86a8e7; }
-        .comment-date { font-size: 0.85rem; color: var(--text-secondary); }
-        .comment-content { line-height: 1.6; }
+
+        .submit-btn {
+            padding: 12px 30px;
+            background: var(--md-primary);
+            color: var(--md-on-primary);
+            border: none;
+            border-radius: var(--shape-full);
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            transition: transform 0.45s var(--spring), background 0.3s ease, border-radius 0.4s var(--spring);
+        }
+        .submit-btn:hover { background: var(--md-primary-hover); transform: translateY(-3px); border-radius: var(--shape-md); }
+        .submit-btn:active { transform: translateY(-1px) scale(0.98); }
+        .submit-btn i { margin-right: 6px; }
+
+        .comments-list { display: flex; flex-direction: column; gap: 14px; }
+        .comment-item {
+            background: var(--glass-tint);
+            border: 1px solid var(--glass-stroke-soft);
+            border-radius: var(--shape-md);
+            padding: 18px 20px;
+            transition: border-radius 0.4s var(--spring), border-color 0.3s ease;
+        }
+        .comment-item:hover { border-color: var(--md-primary); border-radius: var(--shape-lg) var(--shape-sm) var(--shape-lg) var(--shape-sm); }
+        .comment-header { display: flex; justify-content: space-between; margin-bottom: 10px; gap: 10px; flex-wrap: wrap; }
+        .comment-author { font-weight: 700; color: var(--md-secondary); }
+        .comment-date { font-size: 0.82rem; color: var(--text-secondary); }
+        .comment-content { line-height: 1.6; word-break: break-word; }
         .no-comments { text-align: center; color: var(--text-secondary); padding: 30px; }
-        .not-found { text-align: center; padding: 50px; }
-        .not-found i { font-size: 4rem; color: var(--text-secondary); margin-bottom: 20px; }
+        .no-comments i { font-size: 2rem; margin-bottom: 10px; display: block; opacity: 0.5; }
+
+        .not-found { text-align: center; padding: 50px 20px; }
+        .not-found i { font-size: 3.5rem; color: var(--md-primary); margin-bottom: 20px; opacity: 0.6; }
         .loading { text-align: center; padding: 50px; color: var(--text-secondary); }
-        .loading i { font-size: 2rem; animation: spin 1s linear infinite; }
+        .loading i { font-size: 2rem; color: var(--md-primary); animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--accent); color: white; padding: 15px 30px; border-radius: 10px; z-index: 4000; transition: transform 0.3s; }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--glass-fill-strong);
+            backdrop-filter: blur(var(--blur)) saturate(180%);
+            -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
+            color: var(--text-primary);
+            font-weight: 600;
+            padding: 15px 30px;
+            border-radius: var(--shape-full);
+            border: 1px solid var(--glass-stroke-soft);
+            box-shadow: 0 12px 40px var(--glass-shadow), inset 0 1px 0 var(--glass-highlight);
+            z-index: 4000;
+            transition: transform 0.5s var(--spring-soft);
+        }
         .toast.show { transform: translateX(-50%) translateY(0); }
-        footer { display: flex; flex-direction: column; align-items: center; padding: 25px; background: var(--footer-bg); border-top: 1px solid var(--border); }
-        .time-label { color: #86a8e7; margin-right: 10px; }
-        .time-value { color: #feb47b; }
-        .copyright { margin-top: 20px; color: var(--text-secondary); }
-        .time-icon { margin-right: 15px; color: #ff7e5f; animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+
+        footer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 22px;
+            margin: 14px;
+            border-radius: var(--shape-xl);
+            background: var(--glass-fill);
+            backdrop-filter: blur(var(--blur)) saturate(180%);
+            -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
+            border: 1px solid var(--glass-stroke-soft);
+            box-shadow: inset 0 1px 0 var(--glass-highlight);
+        }
+        .copyright { color: var(--text-secondary); font-weight: 500; }
+
+        .ripple { position: absolute; border-radius: 50%; background: rgba(255, 255, 255, 0.5); transform: scale(0); animation: rippleEffect 0.6s var(--ease-standard); pointer-events: none; }
+        @keyframes rippleEffect { to { transform: scale(4); opacity: 0; } }
+
+        @media (max-width: 600px) {
+            .title { font-size: 1.5rem; }
+            .post-card, .comments-section { padding: 22px; }
+            .post-title { font-size: 1.6rem; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+            body::before { animation: none; }
+        }
     </style>
 </head>
 <body class="page-transition">
@@ -84,7 +331,7 @@
         <h1 class="title">帖子详情</h1>
         <button class="search-btn" onclick="location.href='../search.html'"><i class="fas fa-search"></i></button>
     </header>
-    
+
     <main>
         <div class="container">
             <a href="../post.html" class="back-btn"><i class="fas fa-arrow-left"></i> 返回帖子列表</a>
@@ -94,82 +341,144 @@
                 <h3 class="comments-title"><i class="fas fa-comments"></i> 评论区</h3>
                 <div class="comment-form">
                     <input type="text" class="form-input" id="commentAuthor" placeholder="你的昵称" maxlength="20">
-                    <textarea class="form-input form-textarea" id="commentContent" placeholder="写下你的评论..."></textarea>
+                    <textarea class="form-input form-textarea" id="commentContent" placeholder="写下你的评论..." maxlength="1000"></textarea>
                     <button class="submit-btn" onclick="submitComment()"><i class="fas fa-paper-plane"></i> 发表评论</button>
                 </div>
                 <div class="comments-list" id="commentsList"></div>
             </div>
         </div>
     </main>
-    
+
     <div class="toast" id="toast"></div>
-    
+
     <footer>
         <div class="copyright">© 2026 ぼりんの网站 | 帖子详情</div>
     </footer>
-    
+
     <script>
         const API_POSTS = '/api/posts';
-        
-        // 从URL获取帖子ID: /p/?id=123 或 /p/index.html?id=123
+
         const urlParams = new URLSearchParams(window.location.search);
         const postId = parseInt(urlParams.get('id') || '1');
-        
+
         let currentPost = null, allPosts = [];
-        
+
+        // ===== HTML 转义：评论与正文均来自用户，必须转义防止注入 =====
+        function esc(str) {
+            return String(str == null ? '' : str)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
         function getBeijingHour() { const n = new Date(), u = n.getTime() + n.getTimezoneOffset() * 60000; return new Date(u + 28800000).getHours(); }
-        function initTheme() { applyTheme(getCookie('theme') || (getBeijingHour() >= 6 && getBeijingHour() < 18 ? 'light' : 'dark')); }
         function applyTheme(t) { document.documentElement.setAttribute('data-theme', t); }
+        function initTheme() { applyTheme(getCookie('theme') || (getBeijingHour() >= 6 && getBeijingHour() < 18 ? 'light' : 'dark')); }
         function getCookie(n) { const c = document.cookie.split('; ').find(r => r.startsWith(n + '=')); return c ? decodeURIComponent(c.split('=')[1]) : null; }
         function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2000); }
         function getTimeAgo(d) { const diff = Date.now() - new Date(d).getTime(), m = Math.floor(diff/60000), h = Math.floor(diff/3600000), dd = Math.floor(diff/86400000); if(dd>30) return Math.floor(dd/30)+'个月前'; if(dd>0) return dd+'天前'; if(h>0) return h+'小时前'; if(m>0) return m+'分钟前'; return '刚刚'; }
         function formatDate(d) { const n = new Date(d); return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0')+' '+String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0'); }
-        
+
+        // ===== MD3 动态配色（继承首页种子色） =====
+        function hexToHsl(hex) {
+            let r = parseInt(hex.slice(1, 3), 16) / 255, g = parseInt(hex.slice(3, 5), 16) / 255, b = parseInt(hex.slice(5, 7), 16) / 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+            if (max === min) { h = s = 0; }
+            else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    default: h = (r - g) / d + 4;
+                }
+                h /= 6;
+            }
+            return [h * 360, s * 100, l * 100];
+        }
+        function hsl(h, s, l) { return `hsl(${h.toFixed(0)}, ${s.toFixed(0)}%, ${l.toFixed(0)}%)`; }
+        function applySeed(seed) {
+            const [h, s] = hexToHsl(seed);
+            const root = document.documentElement.style;
+            const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+            root.setProperty('--seed', seed);
+            root.setProperty('--md-primary', seed);
+            root.setProperty('--md-secondary', hsl((h + 210) % 360, Math.min(s, 70), dark ? 78 : 68));
+            root.setProperty('--md-tertiary', hsl((h + 60) % 360, Math.min(s, 80), dark ? 75 : 70));
+            const aL = dark ? 16 : 95, bL = dark ? 14 : 93;
+            root.setProperty('--bg-grad-1', hsl(h, Math.min(s, 60), aL));
+            root.setProperty('--bg-grad-2', hsl((h + 30) % 360, Math.min(s, 55), bL - 1));
+            root.setProperty('--bg-grad-3', hsl((h + 200) % 360, Math.min(s, 55), aL - 2));
+            root.setProperty('--bg-grad-4', hsl((h + 60) % 360, Math.min(s, 55), bL));
+            root.setProperty('--glass-tint', `hsla(${h.toFixed(0)}, ${Math.min(s,80).toFixed(0)}%, ${dark ? 60 : 55}%, ${dark ? 0.1 : 0.07})`);
+        }
+
         initTheme();
-        
+        const savedSeed = getCookie('seed');
+        if (savedSeed) applySeed(savedSeed);
+
         async function loadPost() {
             try {
                 const res = await fetch(API_POSTS);
                 if (res.ok) {
                     const localPosts = JSON.parse(localStorage.getItem('borin_posts') || '[]');
                     const remotePosts = (await res.json()).posts || [];
-                    // 合并数据，本地优先
                     const localIds = new Set(localPosts.map(p => p.id));
                     const newFromRemote = remotePosts.filter(p => !localIds.has(p.id));
                     allPosts = [...localPosts, ...newFromRemote];
                     allPosts.sort((a, b) => b.id - a.id);
+                } else {
+                    allPosts = JSON.parse(localStorage.getItem('borin_posts') || '[]');
                 }
-                else { allPosts = JSON.parse(localStorage.getItem('borin_posts') || '[]'); }
-            } catch(e) { allPosts = JSON.parse(localStorage.getItem('borin_posts') || '[]'); }
-            
+            } catch(e) {
+                allPosts = JSON.parse(localStorage.getItem('borin_posts') || '[]');
+            }
+
             currentPost = allPosts.find(p => p.id === postId);
             document.getElementById('loading').style.display = 'none';
-            
+
             if (!currentPost) {
                 document.getElementById('postCard').innerHTML = '<div class="not-found"><i class="fas fa-exclamation-circle"></i><p>帖子不存在</p><a href="../post.html" class="back-btn" style="margin-top:20px"><i class="fas fa-arrow-left"></i> 返回</a></div>';
                 document.getElementById('postCard').style.display = 'block';
                 return;
             }
-            
-            document.title = currentPost.title + ' - ぼりんの网站';
-            
-            let html = '<div class="post-header"><h2 class="post-title">' + currentPost.title + '</h2><div class="post-meta"><div class="post-tags">' + currentPost.tags.map(t => '<span class="post-tag">#' + t + '</span>').join(' ') + '</div><div><i class="fas fa-calendar"></i> ' + formatDate(currentPost.date) + ' (' + getTimeAgo(currentPost.date) + ')</div></div></div><div class="post-body">' + currentPost.content + '</div>';
-            if (currentPost.images && currentPost.images.length) { html += '<div class="post-images">' + currentPost.images.map(img => '<img src="' + img + '" onclick="window.open(this.src)">').join('') + '</div>'; }
-            
+
+            document.title = (currentPost.title || '帖子') + ' - ぼりんの网站';
+
+            const tags = (currentPost.tags || []).map(t => '<span class="post-tag">#' + esc(t) + '</span>').join(' ');
+            let html = '<div class="post-header"><h2 class="post-title">' + esc(currentPost.title) + '</h2><div class="post-meta"><div class="post-tags">' + tags + '</div><div><i class="fas fa-calendar"></i> ' + esc(formatDate(currentPost.date)) + ' (' + esc(getTimeAgo(currentPost.date)) + ')</div></div></div><div class="post-body">' + esc(currentPost.content) + '</div>';
+
+            if (currentPost.images && currentPost.images.length) {
+                // 仅接受 data: 或 http(s): 图片，避免 javascript: 之类的协议注入
+                const safeImgs = currentPost.images.filter(src => /^(data:image\/|https?:\/\/)/i.test(src || ''));
+                if (safeImgs.length) {
+                    html += '<div class="post-images">' + safeImgs.map(img => '<img src="' + esc(img) + '" alt="帖子图片">').join('') + '</div>';
+                }
+            }
+
             document.getElementById('postCard').innerHTML = html;
             document.getElementById('postCard').style.display = 'block';
             document.getElementById('commentsSection').style.display = 'block';
+
+            // 图片点击放大（事件绑定，避免内联 onclick 注入 this.src）
+            document.querySelectorAll('.post-images img').forEach(img => {
+                img.addEventListener('click', () => window.open(img.src, '_blank', 'noopener'));
+            });
+
             renderComments();
         }
-        
+
         function renderComments() {
             const list = document.getElementById('commentsList'), comments = currentPost.comments || [];
             if (!comments.length) { list.innerHTML = '<div class="no-comments"><i class="fas fa-comment-slash"></i><p>暂无评论</p></div>'; return; }
-            list.innerHTML = comments.map(c => '<div class="comment-item"><div class="comment-header"><span class="comment-author">' + c.author + '</span><span class="comment-date">' + formatDate(c.date) + '</span></div><div class="comment-content">' + c.content + '</div></div>').join('');
+            list.innerHTML = comments.map(c =>
+                '<div class="comment-item"><div class="comment-header"><span class="comment-author">' + esc(c.author) + '</span><span class="comment-date">' + esc(formatDate(c.date)) + '</span></div><div class="comment-content">' + esc(c.content) + '</div></div>'
+            ).join('');
         }
-        
+
         async function submitComment() {
-            const author = document.getElementById('commentAuthor').value.trim(), content = document.getElementById('commentContent').value.trim();
+            const author = document.getElementById('commentAuthor').value.trim();
+            const content = document.getElementById('commentContent').value.trim();
             if (!author) return showToast('请输入昵称');
             if (!content) return showToast('请输入评论内容');
             if (!currentPost.comments) currentPost.comments = [];
@@ -178,14 +487,14 @@
             if (idx !== -1) {
                 allPosts[idx] = currentPost;
                 localStorage.setItem('borin_posts', JSON.stringify(allPosts));
-                // 云端写入需要管理员令牌，访客评论仅保存在本地
+                // 注意：云端写入需要管理员令牌，访客评论目前仅保存在本地浏览器
             }
             document.getElementById('commentAuthor').value = '';
             document.getElementById('commentContent').value = '';
             renderComments();
             showToast('评论成功！');
         }
-        
+
         loadPost();
     </script>
 </body>
