@@ -109,8 +109,7 @@
     </footer>
     
     <script>
-        const _c = {b:"69abb4bbd0ea881f40f802db",k:""};
-        const API_URL = "https://api.jsonbin.io/v3/b/" + _c.b;
+        const API_POSTS = '/api/posts';
         
         // 从URL获取帖子ID: /p/?id=123 或 /p/index.html?id=123
         const urlParams = new URLSearchParams(window.location.search);
@@ -130,10 +129,10 @@
         
         async function loadPost() {
             try {
-                const res = await fetch(API_URL + '/latest', { headers: { 'Content-Type': 'application/json' } });
+                const res = await fetch(API_POSTS);
                 if (res.ok) {
                     const localPosts = JSON.parse(localStorage.getItem('borin_posts') || '[]');
-                    const remotePosts = (await res.json()).record.posts || [];
+                    const remotePosts = (await res.json()).posts || [];
                     // 合并数据，本地优先
                     const localIds = new Set(localPosts.map(p => p.id));
                     const newFromRemote = remotePosts.filter(p => !localIds.has(p.id));
@@ -179,7 +178,7 @@
             if (idx !== -1) {
                 allPosts[idx] = currentPost;
                 localStorage.setItem('borin_posts', JSON.stringify(allPosts));
-                try { await fetch(API_URL, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({posts: allPosts}) }); } catch(e) {}
+                // 云端写入需要管理员令牌，访客评论仅保存在本地
             }
             document.getElementById('commentAuthor').value = '';
             document.getElementById('commentContent').value = '';
