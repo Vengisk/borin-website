@@ -424,11 +424,72 @@
   }
   .copy-btn:hover { color: var(--text); border-color: var(--accent3); }
 
+  /* ===== 手写查找面板 ===== */
+  .hw-layout {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+  .hw-canvas-wrap {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 10px;
+    flex-shrink: 0;
+  }
+  #hwCanvas {
+    background: #13132a;
+    border-radius: 10px;
+    touch-action: none;
+    cursor: crosshair;
+    display: block;
+    width: 280px;
+    height: 280px;
+  }
+  .hw-side { flex: 1; min-width: 220px; }
+  .hw-controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .hw-tip {
+    color: var(--text2);
+    font-size: 0.8rem;
+    line-height: 1.7;
+  }
+  .hw-result {
+    display: none;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .hw-chip {
+    padding: 8px 16px;
+    border: 1px solid var(--border);
+    background: var(--bg3);
+    color: var(--text);
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1.3rem;
+    transition: all 0.2s;
+  }
+  .hw-chip:hover { border-color: var(--accent3); }
+  .hw-chip-top { font-weight: 700; }
+  .hw-chip-active {
+    border-color: var(--accent2);
+    background: rgba(247,106,180,0.12);
+    color: var(--accent2);
+  }
+  #hwMatch.kana-detail.show { margin-top: 18px; }
+
   /* ===== 响应式 ===== */
   @media(max-width:480px) {
     header h1 { font-size: 1.6rem; }
     .kana-cell { min-width: 56px; }
     .kana-main { font-size: 1.2rem; }
+    #hwCanvas { width: 100%; height: auto; aspect-ratio: 1/1; }
   }
 
   /* scrollbar */
@@ -448,6 +509,7 @@
 <div class="tabs">
   <button class="tab-btn active" onclick="switchTab('kana')">🔤 假名查询</button>
   <button class="tab-btn" onclick="switchTab('translate')">🌐 翻译 & 分析</button>
+  <button class="tab-btn" onclick="switchTab('write')">✍️ 手写查找</button>
 </div>
 
 <div class="main">
@@ -530,6 +592,34 @@
         <div class="legend-item"><div class="legend-dot" style="background:var(--pos-intj)"></div>感叹词</div>
       </div>
       <div class="analysis-result empty" id="analysisResult">翻译完成后，这里将显示词性分析与用法说明。悬停词汇可查看详情。</div>
+    </div>
+
+  </div>
+
+  <!-- ===== 手写查找面板 ===== -->
+  <div class="panel" id="panel-write">
+
+    <div class="card">
+      <div class="card-title">✍️ 手写输入识别</div>
+      <div class="hw-layout">
+        <div class="hw-canvas-wrap">
+          <canvas id="hwCanvas" width="300" height="300"></canvas>
+        </div>
+        <div class="hw-side">
+          <div class="hw-controls">
+            <button class="btn btn-primary" onclick="hwRecognize()">识 别</button>
+            <button class="btn btn-ghost" onclick="hwUndo()">撤 销</button>
+            <button class="btn btn-ghost" onclick="hwClear()">清 空</button>
+          </div>
+          <div class="hw-tip">
+            在画布上写一个假名、汉字或单词，点击「识别」即可查找对应的字。<br>
+            识别结果会自动与假名表 / 常用词库比对；写多个字符可直接跳转到翻译与词性分析。<br>
+            <span style="color:var(--text3)">＊该功能调用在线手写识别服务，需联网使用。</span>
+          </div>
+          <div class="hw-result" id="hwResult"></div>
+        </div>
+      </div>
+      <div class="kana-detail" id="hwMatch"></div>
     </div>
 
   </div>
@@ -881,11 +971,229 @@ document.getElementById('transInput').addEventListener('keydown', e => {
 });
 
 // =============================================
+//  手写输入识别
+// =============================================
+let hwCanvas, hwCtx;
+let hwStrokes = [];
+let hwDrawing = false;
+
+function initHandwrite() {
+  hwCanvas = document.getElementById('hwCanvas');
+  hwCtx = hwCanvas.getContext('2d');
+  hwCtx.strokeStyle = '#e8e8f5';
+  hwCtx.lineWidth = 7;
+  hwCtx.lineCap = 'round';
+  hwCtx.lineJoin = 'round';
+  hwDrawGuide();
+
+  hwCanvas.addEventListener('pointerdown', hwStart);
+  hwCanvas.addEventListener('pointermove', hwMove);
+  hwCanvas.addEventListener('pointerup', hwEnd);
+  hwCanvas.addEventListener('pointerleave', hwEnd);
+  hwCanvas.addEventListener('pointercancel', hwEnd);
+}
+
+function hwPos(e) {
+  const rect = hwCanvas.getBoundingClientRect();
+  return {
+    x: Math.round((e.clientX - rect.left) * (hwCanvas.width / rect.width)),
+    y: Math.round((e.clientY - rect.top) * (hwCanvas.height / rect.height))
+  };
+}
+
+function hwStart(e) {
+  e.preventDefault();
+  hwDrawing = true;
+  const p = hwPos(e);
+  hwStrokes.push({x:[p.x], y:[p.y], t:[Date.now()]});
+  hwCtx.beginPath();
+  hwCtx.moveTo(p.x, p.y);
+  try { hwCanvas.setPointerCapture(e.pointerId); } catch(err) {}
+}
+
+function hwMove(e) {
+  if(!hwDrawing) return;
+  e.preventDefault();
+  const p = hwPos(e);
+  const stroke = hwStrokes[hwStrokes.length - 1];
+  stroke.x.push(p.x); stroke.y.push(p.y); stroke.t.push(Date.now());
+  hwCtx.lineTo(p.x, p.y);
+  hwCtx.stroke();
+}
+
+function hwEnd(e) {
+  hwDrawing = false;
+}
+
+function hwDrawGuide() {
+  hwCtx.save();
+  hwCtx.strokeStyle = 'rgba(255,255,255,0.08)';
+  hwCtx.lineWidth = 1;
+  hwCtx.setLineDash([4,4]);
+  hwCtx.beginPath();
+  hwCtx.moveTo(hwCanvas.width/2, 0); hwCtx.lineTo(hwCanvas.width/2, hwCanvas.height);
+  hwCtx.moveTo(0, hwCanvas.height/2); hwCtx.lineTo(hwCanvas.width, hwCanvas.height/2);
+  hwCtx.stroke();
+  hwCtx.restore();
+}
+
+function hwRedraw() {
+  hwCtx.clearRect(0, 0, hwCanvas.width, hwCanvas.height);
+  hwDrawGuide();
+  hwStrokes.forEach(s => {
+    hwCtx.beginPath();
+    hwCtx.moveTo(s.x[0], s.y[0]);
+    for(let i = 1; i < s.x.length; i++) hwCtx.lineTo(s.x[i], s.y[i]);
+    hwCtx.stroke();
+  });
+}
+
+function hwUndo() {
+  hwStrokes.pop();
+  hwRedraw();
+}
+
+function hwClear() {
+  hwStrokes = [];
+  hwRedraw();
+  const resultEl = document.getElementById('hwResult');
+  resultEl.style.display = 'none';
+  resultEl.innerHTML = '';
+  const matchEl = document.getElementById('hwMatch');
+  matchEl.classList.remove('show');
+  matchEl.innerHTML = '';
+}
+
+// 调用 Google 手写识别服务（与翻译功能同源的免费公开接口）
+async function hwRequestRecognition(strokes) {
+  const ink = strokes.map(s => [s.x, s.y, s.t.map(t => t - s.t[0])]);
+  const body = {
+    app_version: 0.4,
+    api_level: '537.36',
+    device: navigator.userAgent,
+    input_type: 0,
+    options: 'enable_pre_space',
+    requests: [{
+      writing_guide: { writing_area_width: hwCanvas.width, writing_area_height: hwCanvas.height },
+      pre_context: '',
+      max_num_results: 8,
+      max_completions: 0,
+      language: 'ja',
+      ink: ink
+    }]
+  };
+  const resp = await fetch('https://www.google.com/inputtools/request?ime=handwriting&app=translate&dbg=0&cs=1&oe=UTF-8', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  const data = await resp.json();
+  if(data[0] !== 'SUCCESS') throw new Error('识别失败');
+  return data[1][0][1] || [];
+}
+
+async function hwRecognize() {
+  if(!hwStrokes.length) return;
+  const resultEl = document.getElementById('hwResult');
+  resultEl.style.display = 'flex';
+  resultEl.innerHTML = '<span class="loading"></span> 识别中…';
+  const matchEl = document.getElementById('hwMatch');
+  matchEl.classList.remove('show');
+
+  try {
+    const candidates = await hwRequestRecognition(hwStrokes);
+    renderHwResults(candidates);
+  } catch(e) {
+    resultEl.innerHTML = `<span style="color:var(--pos-suffix)">识别失败，请检查网络连接（该功能依赖Google在线识别服务，部分网络环境可能无法访问）。也可以用「假名查询」中的搜索框手动查找。</span>`;
+  }
+}
+
+function renderHwResults(candidates) {
+  const resultEl = document.getElementById('hwResult');
+  resultEl.innerHTML = '';
+  resultEl.style.display = 'flex';
+  if(!candidates || !candidates.length) {
+    resultEl.innerHTML = '<span style="color:var(--text3)">未识别到结果，建议写得更清晰、笔画顺序更标准后重试。</span>';
+    return;
+  }
+  candidates.forEach((c, idx) => {
+    const chip = document.createElement('button');
+    chip.className = 'hw-chip' + (idx === 0 ? ' hw-chip-top' : '');
+    chip.textContent = c;
+    chip.onclick = () => selectHwCandidate(c, chip);
+    resultEl.appendChild(chip);
+  });
+  selectHwCandidate(candidates[0], resultEl.firstChild);
+}
+
+function selectHwCandidate(ch, chipEl) {
+  document.querySelectorAll('#hwResult .hw-chip').forEach(c => c.classList.remove('hw-chip-active'));
+  if(chipEl) chipEl.classList.add('hw-chip-active');
+
+  const matchEl = document.getElementById('hwMatch');
+
+  // 单字符：优先在假名表中查找
+  if(ch.length === 1) {
+    const kanaMatch = HIRAGANA.find(k => k[0] === ch || k[1] === ch);
+    if(kanaMatch) {
+      const isHira = kanaMatch[0] === ch;
+      const typeColor = isHira ? 'var(--pos-noun)' : 'var(--accent3)';
+      matchEl.innerHTML = `
+        <div class="kd-big" style="color:${typeColor}">${ch}</div>
+        <div class="kd-info">
+          <div class="kd-roma">罗马音：${kanaMatch[2]}</div>
+          <div class="kd-pair">${isHira ? '对应片假名' : '对应平假名'}：<span>${isHira ? kanaMatch[1] : kanaMatch[0]}</span></div>
+          <div class="kd-pair" style="margin-top:4px;color:var(--text3);">所属行：${kanaMatch[3]}</div>
+        </div>
+        <button class="btn btn-ghost" onclick="jumpToKana('${isHira ? 'hira' : 'kata'}','${kanaMatch[3]}')">在假名表中查看 →</button>`;
+      matchEl.classList.add('show');
+      return;
+    }
+    // 再在常用词/助词库中查找
+    if(POS_DB[ch]) {
+      const info = POS_DB[ch];
+      matchEl.innerHTML = `
+        <div class="kd-big">${ch}</div>
+        <div class="kd-info">
+          <div class="kd-roma">[${info.label}]</div>
+          <div class="kd-pair">${info.usage}</div>
+          <div class="kd-pair" style="margin-top:4px;color:var(--accent3);">常用法：${info.common}</div>
+        </div>`;
+      matchEl.classList.add('show');
+      return;
+    }
+  }
+
+  // 未在本地词库中找到，或为多字符词语/句子：跳转到翻译与词性分析
+  matchEl.innerHTML = `
+    <div class="kd-info" style="flex:1;min-width:160px;">未在假名表 / 常用词库中直接找到「${ch}」，可前往翻译与词性分析进一步查看。</div>
+    <button class="btn btn-primary" onclick="sendToTranslate('${ch}')">去分析 →</button>`;
+  matchEl.classList.add('show');
+}
+
+function jumpToKana(type, row) {
+  switchTab('kana');
+  const tabsId = type === 'hira' ? 'hiraRowTabs' : 'kataRowTabs';
+  document.querySelectorAll('#'+tabsId+' .row-tab').forEach(b => {
+    b.classList.toggle('active', b.textContent === row);
+  });
+  if(type === 'hira') currentHiraRow = row; else currentKataRow = row;
+  renderGrid(type);
+}
+
+function sendToTranslate(text) {
+  switchTab('translate');
+  setDir('ja2zh');
+  document.getElementById('transInput').value = text;
+  doTranslate();
+}
+
+// =============================================
 //  Tab 切换
 // =============================================
 function switchTab(tab) {
   document.querySelectorAll('.tab-btn').forEach((b,i) => {
-    b.classList.toggle('active', ['kana','translate'][i] === tab);
+    b.classList.toggle('active', ['kana','translate','write'][i] === tab);
   });
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.getElementById('panel-'+tab).classList.add('active');
@@ -899,6 +1207,7 @@ function init() {
   buildRowTabs('kataRowTabs', 'kata');
   renderGrid('hira');
   renderGrid('kata');
+  initHandwrite();
 }
 
 init();
