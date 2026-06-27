@@ -34,9 +34,9 @@ Sitemap: https://vengisk.cc.cd/sitemap.xml
 # ai-train: training or fine-tuning AI models.
 
 # We allow reasonable data collection for AI training, but excessive collection may expose you to legal liability
-search = yes
-ai-input = yes
-ai-train = yes
+search: yes
+ai-input: yes
+ai-train: yes
 
 # ANY RESTRICTIONS EXPRESSED VIA CONTENT SIGNALS ARE EXPRESS RESERVATIONS OF
 # RIGHTS UNDER ARTICLE 4 OF THE EUROPEAN UNION DIRECTIVE 2019/790 ON COPYRIGHT
